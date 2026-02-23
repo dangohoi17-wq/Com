@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SHOP ACC FREE FIRE</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0b0b0b;
+    color:white;
+}
+
+.header{
+    background:#111;
+    padding:18px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    box-shadow:0 0 20px #00ffcc;
+}
+
+.balance{
+    text-align:center;
+    margin:10px;
+    font-size:18px;
+    color:#00ffcc;
+}
+
+/* KHUNG NẠP */
+.topup{
+    margin:15px;
+    padding:15px;
+    background:#1a1a1a;
+    border-radius:12px;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin:6px 0;
+    border:none;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:8px;
+    border:none;
+    border-radius:8px;
+    background:#00ffcc;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.note{
+    margin-top:10px;
+    background:#111;
+    padding:10px;
+    border-radius:8px;
+    font-size:14px;
+    color:#ffcc00;
+}
+
+/* GRID ACC */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+    padding:20px;
+}
+
+/* CARD */
+.card{
+    background:#1a1a1a;
+    border-radius:15px;
+    padding:15px;
+    box-shadow:0 0 15px #00ffcc33;
+}
+
+/* ẢNH TO FULL */
+.card img{
+    width:100%;
+    height:auto;
+    max-height:600px;
+    object-fit:contain;
+    border-radius:12px;
+    background:#000;
+}
+
+.price{
+    color:#00ffcc;
+    font-size:18px;
+    font-weight:bold;
+}
+
+/* POPUP */
+.popup{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.9);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.popup-box{
+    background:#111;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.loader{
+    border:6px solid #333;
+    border-top:6px solid #00ffcc;
+    border-radius:50%;
+    width:50px;
+    height:50px;
+    margin:auto;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🔥 SHOP HOI.DZ.COM 🔥</div>
+
+<div class="balance">
+Số dư: <span id="money">0</span> VNĐ
+</div>
+
+<div class="topup">
+<h3>Nạp Thẻ</h3>
+
+<select>
+<option>Viettel</option>
+<option>Mobifone</option>
+<option>Vinaphone</option>
+<option>Vietnamobile</option>
+</select>
+
+<input type="text" id="seri" placeholder="Nhập seri thẻ">
+<input type="text" id="code" placeholder="Nhập mã thẻ">
+
+<button onclick="topup()">Nạp ngay</button>
+
+<div class="note">
+⚠ Nếu nạp xong tiền chưa vào hãy liên hệ qua tik tok để được hỗ trợ,Lưu ý nếu nhập không đúng thẻ, tiền sẽ không vào !
+</div>
+</div>
+
+<div class="grid" id="shop"></div>
+
+<div class="popup" id="popup">
+   <div class="popup-box">
+      <div class="loader"></div>
+      <p>Đang xử lý,tiền sẽ + vào số dư 2~5phút</p>
+   </div>
+</div>
+
+<script>
+
+let balance = 0;
+
+/* DÁN ẢNH CỦA BẠN VÀO ĐÂY */
+let accounts = [
+{ id:1, price: 200000,img:"https://i.postimg.cc/kGFhtVJQ/Messenger-creation-FC14422F-4C71-41DC-BA57-2C0B0E106BA2.jpg" },
+{ id:2, price:200000, img:"https://i.postimg.cc/dtV99N4K/Messenger-creation-6EEE857F-EA0F-4E60-9BAE-10EC69F01A4D.jpg" },
+{ id:3, price:300000, img:"https://i.postimg.cc/vmf7mJH5/Messenger-creation-F2702AA9-9B9E-4763-A8EB-A747E962C9B8.jpg" },
+{ id:4, price:350000, img:"https://i.postimg.cc/GmHw6Qhn/FB-IMG-1771813930432.jpg" },
+{ id:5, price:350000, img:"https://i.postimg.cc/rmq4wzPJ/Messenger-creation-FC25AC81-0E16-4007-B236-A313713DA0CE.jpg" },
+{ id:6, price:300000, img:"https://i.postimg.cc/tTdLFvDW/FB-IMG-1771813923164.jpg" },
+{ id:7, price:300000, img:"https://i.postimg.cc/BZgr6yX2/FB-IMG-1771813911115.jpg" },
+{ id:8, price:300000, img:"https://i.postimg.cc/GpfpZt1p/FB-IMG-1771813522071.jpg" },
+{ id:9, price:250000, img:"https://i.postimg.cc/9fZSjN33/FB-IMG-1771813818420.jpg" },
+{ id:10, price:250000, img:"https://i.postimg.cc/y6QL2zJ6/FB-IMG-1771813906620.jpg" },
+{ id:11, price:300000, img:"https://i.postimg.cc/cLQM1qJJ/FB-IMG-1771813807379.jpg" },
+{ id:12, price:400000, img:"https://i.postimg.cc/h4zmPFCN/Messenger-creation-C755CA92-7744-4BF5-A23E-72C4CD229F63.jpg" },
+{ id:13, price:350000, img:"https://i.postimg.cc/BZVCMcyb/FB-IMG-1771813777691.jpg" },
+{ id:14, price:300000, img:"https://i.postimg.cc/tgcgLJHY/FB-IMG-1771813453502.jpg" },
+{ id:15, price:300000, img:"https://i.postimg.cc/jj1jG2r2/FB_IMG_1771813511353.jpg" }
+];
+
+function loadShop(){
+    let shop=document.getElementById("shop");
+    shop.innerHTML="";
+    accounts.forEach((acc,index)=>{
+        shop.innerHTML+=`
+        <div class="card">
+            <img src="${acc.img}">
+            <p>Acc #${acc.id}</p>
+            <p class="price">${acc.price.toLocaleString()} VNĐ</p>
+            <button onclick="buy(${index})">Mua</button>
+        </div>
+        `;
+    });
+}
+
+function topup(){
+    let seri=document.getElementById("seri").value;
+    let code=document.getElementById("code").value;
+
+    if(!seri || !code){
+        alert("Nhập đầy đủ seri và mã thẻ!");
+        return;
+    }
+
+    document.getElementById("popup").style.display="flex";
+
+    setTimeout(()=>{
+        document.getElementById("popup").style.display="none";
+    },2000);
+}
+
+function buy(index){
+    if(balance < accounts[index].price){
+        alert("Không đủ số dư!");
+        return;
+    }
+
+    balance -= accounts[index].price;
+    document.getElementById("money").innerText = balance.toLocaleString();
+    accounts.splice(index,1);
+    loadShop();
+    alert("Mua thành công!");
+}
+
+loadShop();
+
+</script>
+
+</body>
+</html>
